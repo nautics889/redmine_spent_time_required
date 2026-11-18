@@ -1,17 +1,19 @@
 require 'redmine'
-require File.dirname(__FILE__) + '/lib/SpentTimeRequired.rb'
+require File.dirname(__FILE__) + '/lib/spent_time_required.rb'
 
-# require 'dispatcher'
-ActiveSupport::Reloader.to_prepare do
-#ActionDispatch::Callbacks.to_prepare :SpentTimeRequired do
-     IssuesController.send(:include, SpentTimeRequired::Patches::IssuesControllerPatch)
+Rails.configuration.after_initialize do
+  unless IssuesController.ancestors.include?(SpentTimeRequired::Patches::IssuesControllerPatch)
+    IssuesController.prepend(
+      SpentTimeRequired::Patches::IssuesControllerPatch
+    )
+  end
 end
 
 Redmine::Plugin.register :spent_time_required do
   name 'Spent Time Required plugin'
   author 'Rodolfo Stangherlin'
   description 'This plugin makes the "Time Spent" field mandatory.'
-  version '0.2.0'
+  version '0.3.0'
   url 'https://github.com/nautics889/redmine_spent_time_required/tree/master/spent_time_required'
   author_url 'https://gist.github.com/nautics889/452377b90a1f06c7cb4120a6fb51b24c'
 
@@ -24,3 +26,4 @@ Redmine::Plugin.register :spent_time_required do
         :all_statuses => false,
   }, :partial => 'settings/conf_settings')
 end
+
